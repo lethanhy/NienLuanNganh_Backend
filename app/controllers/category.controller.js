@@ -1,6 +1,6 @@
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
-const ContactService = require("../services/contact.service");
+const CategoryService = require("../services/category.service");
 
 
 // exports.create = (req, res) => {
@@ -14,8 +14,8 @@ exports.create = async (req, res, next) => {
     
     }
     try {
-        const contactService = new ContactService(MongoDB.client);
-        const document = await contactService.create(req.body); 
+        const categoryService = new CategoryService(MongoDB.client);
+        const document = await categoryService.create(req.body); 
         return res.send(document);
 
     } catch (error) {
@@ -32,12 +32,12 @@ exports.findAll = async (req, res, next) => {
     let documents = [];
 
     try {
-        const contactService = new ContactService(MongoDB.client);
+        const categoryService = new CategoryService(MongoDB.client);
         const { name } = req.query;
         if (name) {
-            documents = await contactService.findByName(name);
+            documents = await categoryService.findByName(name);
         } else {
-            documents = await contactService.find({});
+            documents = await categoryService.find({});
         }
     } catch (error) {
         return next(
@@ -53,8 +53,8 @@ exports.findAll = async (req, res, next) => {
 // Find a single contact with an id
 exports.findOne = async (req, res, next) => {
     try {
-        const contactService = new ContactService(MongoDB.client);
-        const document = await contactService.findById(req.params.id);
+        const categoryService = new CategoryService(MongoDB.client);
+        const document = await categoryService.findById(req.params.id);
         if (!document) {
             return next(new ApiError(404, "Contact not found"));
         }
@@ -79,8 +79,8 @@ exports.update = async (req, res, next) => {
     }
 
     try {
-        const contactService = new ContactService(MongoDB.client);
-        const document = await contactService.update(req.params.id, req.body);
+        const categoryService = new CategoryService(MongoDB.client);
+        const document = await categoryService.update(req.params.id, req.body);
         if (!document) {
             return res.send({message: "Contact was updated successfully" });
         }
@@ -98,8 +98,8 @@ exports.update = async (req, res, next) => {
 //Delete a contact with the specified id in the request
 exports.delete = async (req, res, next) => {
     try {
-        const contactService = new ContactService(MongoDB.client);
-        const document = await contactService.delete(req.params.id);
+        const categoryService = new CategoryService(MongoDB.client);
+        const document = await categoryService.delete(req.params.id);
         if (!document) {
             return next(new ApiError(404,"Contact was deleted successfully" ));
         }
@@ -120,8 +120,8 @@ exports.delete = async (req, res, next) => {
 // Delete all contacts of user from the database
 exports.deleteAll = async (_req, res, next) => {
     try {
-        const contactService = new ContactService(MongoDB.client);
-        const deletedCount = await contactService.deleteAll();
+        const categoryService = new CategoryService(MongoDB.client);
+        const deletedCount = await categoryService.deleteAll();
         return res.send({
             message: `${deletedCount} contacts were deleted successfully`,
         });
@@ -138,8 +138,8 @@ exports.deleteAll = async (_req, res, next) => {
 // Find all favorite contacts of user
 exports.findAllFavorite = async (_req, res, next) => {
     try {
-        const contactService = new ContactService(MongoDB.client);
-        const documents = await contactService.findFavorite();
+        const categoryService = new CategoryService(MongoDB.client);
+        const documents = await categoryService.findFavorite();
         return res.send(documents);
     } catch (error) {
         return next(

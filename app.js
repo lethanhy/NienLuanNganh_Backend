@@ -1,9 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 const contactsRouter = require("./app/routes/contact.route");
+const usersRouter = require("./app/routes/user.route");
+const productsRouter = require("./app/routes/product.route");
+const ordersRouter = require("./app/routes/order.route");
+const cartsRouter = require("./app/routes/cart.route");
+const categoryRouter = require("./app/routes/category.route");
 const ApiError = require("./app/api-error");
+const dotenv = require("dotenv");
 
 const app = express();
+
+dotenv.config();
 
 app.use(cors());
 app.use(express.json());
@@ -13,6 +21,14 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/contacts", contactsRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/orders", ordersRouter);
+app.use("/api/carts", cartsRouter)
+app.use("/api/category", categoryRouter)
+
+
+
 
 // handle 404 response
 app.use((req, res, next) => {
