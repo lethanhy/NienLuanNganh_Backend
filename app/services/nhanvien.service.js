@@ -1,40 +1,37 @@
 const { ObjectId, Timestamp } = require("mongodb");
 
-class UserService {
+class NhanvienService {
     constructor(client) {
-        this.User = client.db().collection("users");
+        this.Nhanvien = client.db().collection("nhanvien");
        
     }
     
     // Định nghĩa các phương thức truy xuất CSDL sử dụng mongodb API
-    extractUserData(payload) {
-        const user = {
-            username: payload.username,
-            email: payload.email,
-            phone: payload.phone,
+    extractNhanvienData(payload) {
+        const nhanvien = {
+            hotennv: payload.hotennv,
             password: payload.password,
-            isAdmin: false,
-            address: payload.address,
-            favorite: payload.favorite,
-            cart:[],
+            chucvu: payload.chucvu,
+            diachi:payload.diachi,
+            dienthoai:payload.dienthoai,
             create_at: new Date(),
               
-        };
+        };console.log('thành công')
         
          
         //Remove undefined fields
-        Object.keys(user).forEach(
-            (key) => { user[key] === undefined && delete user[key]
+        Object.keys(nhanvien).forEach(
+            (key) => { nhanvien[key] === undefined && delete nhanvien[key]
             });console.log('thành công')
-        return user;
+        return nhanvien;
         
     }
 
     async create(payload) {
-        const user = this.extractUserData(payload);
-        const result = await this.User.findOneAndUpdate(
-            user,
-            { $set: { favorite: user.favorite === true } },
+        const nhanvien = this.extractNhanvienData(payload);
+        const result = await this.Nhanvien.findOneAndUpdate(
+            nhanvien,
+            { $set: {  } },
             { returnDocument: "after", upsert: true }
         );
         return result.value;
@@ -42,23 +39,23 @@ class UserService {
 
 
     async find(filter) {
-        const cursor = await this.User.find(filter);
+        const cursor = await this.Nhanvien.find(filter);
         return await cursor.toArray();
     }
 
-    async findByName(username) {
+    async findByName(hotennv) {
         return await this.find({
-            username: { $regex: new RegExp(username), $options: "i"},
+            hotennv: { $regex: new RegExp(hotennv), $options: "i"},
         });
     }
 
     async findUserLogin(filter) {
-        const cursor = await this.User.findOne(filter);
+        const cursor = await this.Nhanvien.findOne(filter);
         return await cursor;
     }
 
     async findById(id) {
-        return await this.User.findOne({
+        return await this.Nhanvien.findOne({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
@@ -67,8 +64,8 @@ class UserService {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
-        const update = this.extractUserData(payload);
-        const result = await this.User.findOneAndUpdate(
+        const update = this.extractNhanvienData(payload);
+        const result = await this.Nhanvien.findOneAndUpdate(
             filter,
             { $set: update },
             { returnDocument: "after"}
@@ -77,14 +74,14 @@ class UserService {
     }
 
     async delete(id) {
-        const result = await this.User.findOneAndDelete({
+        const result = await this.Nhanvien.findOneAndDelete({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         return result.value;
     }
 
     async deleteAll() {
-        const result = await this.User.deleteMany({});
+        const result = await this.Nhanvien.deleteMany({});
         return result.deletedCount;
     }
 
@@ -103,4 +100,4 @@ class UserService {
     // }
 }
 
-module.exports = UserService;
+module.exports = NhanvienService;

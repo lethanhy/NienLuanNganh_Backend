@@ -1,9 +1,12 @@
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
-const UserService = require("../services/user.service");
+const DocgiaService = require("../services/docgia.service");
 const CartService = require("../services/cart.service");
 const jwt = require("jsonwebtoken");
-const ProductService = require("../services/product.service");
+const ProductService = require("../services/sach.service");
+const bcrypt = require('bcryptjs');
+
+require('dotenv').config();
 
 
 
@@ -14,8 +17,8 @@ exports.create = async (req, res, next) => {
     
     // }
     try {
-        const userService = new UserService(MongoDB.client);
-        const document = await userService.create(req.body); 
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const document = await docgiaService.create(req.body); 
         return res.send(document);
 
     } catch (error) {
@@ -29,12 +32,12 @@ exports.findAll = async (req, res, next) => {
     let documents = [];
 
     try {
-        const userService = new UserService(MongoDB.client);
-        const { username } = req.query;
-        if (username) {
-            documents = await userService.findByName(username);
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const { ten } = req.query;
+        if (ten) {
+            documents = await docgiaService.findByName(ten);
         } else {
-            documents = await userService.find({});
+            documents = await docgiaService.find({});
         }
     } catch (error) {
         return next(
@@ -46,8 +49,8 @@ exports.findAll = async (req, res, next) => {
 
 exports.findOne = async (req, res, next) => {
     try {
-        const userService = new UserService(MongoDB.client);
-        const document = await userService.findById(req.params.id);
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const document = await docgiaService.findById(req.params.id);
         if (!document) {
             return next(new ApiError(404, "Not found"));
         }
@@ -69,8 +72,8 @@ exports.update = async (req, res, next) => {
     }
 
     try {
-        const userService = new UserService(MongoDB.client);
-        const document = await userService.update(req.params.id, req.body);
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const document = await docgiaService.update(req.params.id, req.body);
         if (!document) {
             return res.send({message: "Updated successfully" });
         }
@@ -85,8 +88,8 @@ exports.update = async (req, res, next) => {
 //Delete a contact with the specified id in the request
 exports.delete = async (req, res, next) => {
     try {
-        const userService = new UserService(MongoDB.client);
-        const document = await userService.delete(req.params.id);
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const document = await docgiaService.delete(req.params.id);
         if (!document) {
             return next(new ApiError(404,"Deleted successfully" ));
         }
@@ -104,8 +107,8 @@ exports.delete = async (req, res, next) => {
 // Delete all contacts of user from the database
 exports.deleteAll = async (_req, res, next) => {
     try {
-        const userService = new UserService(MongoDB.client);
-        const deletedCount = await userService.deleteAll();
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const deletedCount = await docgiaService.deleteAll();
         return res.send({
             message: `${deletedCount} Deleted successfully`,
         });
@@ -145,16 +148,29 @@ exports.deleteAll = async (_req, res, next) => {
 
 exports.login = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
-        const userService = new UserService(MongoDB.client);
-        const user = await userService.findUserLogin({ username });
+        const { ten, password } = req.body;
+        const docgiaService = new DocgiaService(MongoDB.client);
+        const docgia = await docgiaService.findUserLogin({ ten });
 
-        if(!user) {
-            res.status(401).json("Sai tên user")
+        if (!docgia) {
+            return res.status(400).json({ message: 'Sai tên' });
         }
 
-        password !== user.password && res.status(401).json("sai password")
+        if (password !== docgia.password) {
+            return res.status(400).json({ message: 'sai mật khẩu' });
+        }
 
+         // Set user ID in a cookie
+         res.cookie('userToken', docgia._id, { httpOnly: true , secure: false, path: "/", sameSite: "strict"});
+        // 
+        res.json({ docgiaId: docgia._id, ten: docgia.ten });
+
+        //  && res.status(401).json("sai password")
+
+        // Create JWT 
+        // const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        // console.log(accessToken);
+    
         // const accessToken = jwt.sign({
         //     id: user._id,
         //     isAdmin: user.isAdmin,
@@ -168,8 +184,9 @@ exports.login = async (req, res, next) => {
         //      res.send('/');
         // }
 
-        res.status(200).json(user);
+        // res.json( user);
         // res.status(200).json("thành công")
+    
        
     }catch (error){
         return next(

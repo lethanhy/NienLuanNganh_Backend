@@ -1,29 +1,30 @@
 const { ObjectId } = require("mongodb");
 
-class CategoryService {
+class NhaxuatbanService {
     constructor(client) {
-        this.Category = client.db().collection("category");
+        this.Nhaxuatban = client.db().collection("nhaxuatban");
        
     }
     // Định nghĩa các phương thức truy xuất CSDL sử dụng mongodb API
-    extractCategoryData(payload) {
-        const category = {
-            name: payload.name,
+    extractNhaxuatbanData(payload) {
+        const nhaxuatban = {
+            ten: payload.ten,
+            diachi:payload.diachi,
         };
         
          
         //Remove undefined fields
-        Object.keys(category).forEach(
-            (key) => category[key] === undefined && delete category[key]
+        Object.keys(nhaxuatban).forEach(
+            (key) => nhaxuatban[key] === undefined && delete nhaxuatban[key]
         );console.log('thành công')
-        return category;
+        return nhaxuatban;
         
     }
 
     async create(payload) {
-        const category = this.extractCategoryData(payload);
-        const result = await this.Category.findOneAndUpdate(
-            category,
+        const nhaxuatban = this.extractNhaxuatbanData(payload);
+        const result = await this.Nhaxuatban.findOneAndUpdate(
+            nhaxuatban,
             { $set: {  } },
             { returnDocument: "after", upsert: true }
         );
@@ -32,18 +33,18 @@ class CategoryService {
 
 
     async find(filter) {
-        const cursor = await this.Category.find(filter);
+        const cursor = await this.Nhaxuatban.find(filter);
         return await cursor.toArray();
     }
 
-    async findByName(name) {
+    async findByName(ten) {
         return await this.find({
-            name: { $regex: new RegExp(name), $options: "i"},
+            ten: { $regex: new RegExp(ten), $options: "i"},
         });
     }
 
     async findById(id) {
-        return await this.Category.findOne({
+        return await this.Nhaxuatban.findOne({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
@@ -52,8 +53,8 @@ class CategoryService {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
-        const update = this.extractCategoryData(payload);
-        const result = await this.Category.findOneAndUpdate(
+        const update = this.extractNhaxuatbanData(payload);
+        const result = await this.Nhaxuatban.findOneAndUpdate(
             filter,
             { $set: update },
             { returnDocument: "after"}
@@ -62,7 +63,7 @@ class CategoryService {
     }
 
     async delete(id) {
-        const result = await this.Category.findOneAndDelete({
+        const result = await this.Nhaxuatban.findOneAndDelete({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         return result.value;
@@ -73,7 +74,7 @@ class CategoryService {
     // }
 
     async deleteAll() {
-        const result = await this.Category.deleteMany({});
+        const result = await this.Nhaxuatban.deleteMany({});
         return result.deletedCount;
     }
 
@@ -81,4 +82,4 @@ class CategoryService {
 
     
 
-module.exports = CategoryService;
+module.exports = NhaxuatbanService;

@@ -1,5 +1,6 @@
 const express = require("express");
-const products = require("../controllers/product.controller");
+const sach = require("../controllers/sach.controller");
+const carts = require("../controllers/cart.controller");
 const multer = require("multer");
 const path = require("path");
 
@@ -20,22 +21,27 @@ const router = express.Router();
 // // Khởi tạo middleware multer
 // const upload = multer({ storage: storage });
 
-
-
-
-
 router.route("/")
-    .get(products.findAll)
-    // .post(products.create)
-    .delete(products.deleteAll);
+    .get(sach.findAll)
+    // .post(sach.create)
+    .delete(sach.deleteAll);
 // router.route("/upload", upload.single('image')).post(products.create);
 
+// router.route("/category/:id")
+//     .get(products.findOneCategory);
+
+// router.route("/category")
+//     .get(products.findAllCategory)
+
 router.route("/:id")
-    .get(products.findOne)
-    .put(products.update)
-    .delete(products.delete);
+    .get(sach.findOne)
+    .put(sach.update)
+    .delete(sach.delete);
 
 router.route("/Add")
-    .post(products.create);
+    .post(sach.create);
+
+router.route("/addcart")
+    .post(sach.addCart);
 
 module.exports = router;
